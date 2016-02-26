@@ -1,11 +1,13 @@
 import java.io.IOException;
 import java.util.Iterator;
+import java.text.*;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -21,15 +23,35 @@ import com.alexholmes.json.mapreduce.MultiLineJsonInputFormat;
 
 public class accounting extends Configured implements Tool {
 
-	public static class AccountingMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
+	public static class AccountingMapper extends Mapper<LongWritable, Text, Text, Text> {
 
 		private Text outputKey = new Text();
-		private IntWritable outputValue = new IntWritable();
+		private Text outputValue = new Text();
 
 		@Override
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 			try {
+				JSONObject json = new JSONObject(value.toString());
+				String text = json.getString("text");
+				String user = json.getString("user");
 
+				double cost = 0.05;
+				int byteChargeCount = text.length() / 10;
+				if (text.length() % 10 > 0) {
+					byteChargeCount++;
+				}
+				for (int charge = 0; charge < byteChargeCount; charge++) {
+					cost += 0.01;
+				}
+				if (text.length() > 100) {
+					cost += 0.05;
+				}
+
+				String costStr = "" + cost;
+
+				outputKey.set(user);
+				outputValue.set(costStr);
+				context.write(outputKey, outputValue);
 			}
 			catch (Exception e) {
 				System.out.println(e);
@@ -38,13 +60,27 @@ public class accounting extends Configured implements Tool {
 
 	}
 
-	public static class AccountingReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+	public static class AccountingReducer extends Reducer<Text, Text, Text, Text> {
 
-		private IntWritable result = new IntWritable();
+		private Text result = new Text();
 
-		@Override
-		public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
+		//@Override
+		public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {			
+			int msgCount = 0;
+			double cost = 0.0;
+			for (Text val : values) {
+				msgCount++;
+				cost += Double.parseDouble(val.toString());
+			}
 
+			if (msgCount > 100) {
+				cost *= .95;
+			}
+
+			DecimalFormat df = new DecimalFormat("$#.##");
+			String res = "" + df.format(cost);
+			result.set(res);
+			context.write(key, result);
 		}
 
 	}
@@ -58,7 +94,7 @@ public class accounting extends Configured implements Tool {
 		job.setMapperClass(AccountingMapper.class);
 		job.setReducerClass(AccountingReducer.class);
 		job.setOutputKeyClass(Text.class);
-		job.setOutputValueClass(IntWritable.class);
+		job.setOutputValueClass(Text.class);
 		job.setInputFormatClass(MultiLineJsonInputFormat.class);
 		MultiLineJsonInputFormat.setInputJsonMember(job, "text");
 
@@ -70,7 +106,7 @@ public class accounting extends Configured implements Tool {
 
 	public static void main(String[] args) throws Exception {
 		Configuration conf = new Configuration();
-		int result = ToolRunner.run(conf, new MultiLineJsonInputFormat(), args);
+		int result = ToolRunner.run(conf, new accounting(), args);
 		System.exit(result);
 	}
 
