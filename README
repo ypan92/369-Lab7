@@ -1,2 +1,45 @@
 Lab 7 for Jordan Tang and Yang Pan
 
+Each program is organized into their own directories
+Makefiles are provided for each program, with variable assignments for each one at the top of each Makefile
+
+The format is as follows:
+
+===============================
+program = histogram
+inputFilepath = ./test/
+inputFile = bfTest100.json
+outputFilepath = ./test/l7p1output
+jarFilepath = ./../jars/*
+mapReduceJarFilepath = ./../jars/json-mapreduce-1.0.jar
+jsonJarFilepath = ./../jars/org.json-20120521.jar
+================================
+
+***The only things that need to be changed are the "inputFile" variable depending on the input file, as well as the inputFilepath if the file is not in a "test" directory on the hadoop fs.***
+
+The commands are as follows, and are the same for each program:
+
+make
+	-This will compile the program
+
+make jar
+	-This will create a jar file with the .class files
+
+make remove
+	-This will remove the output directory on the hadoop fs if it exists
+
+make job
+	-This runs the hadoop job
+
+
+Generators for thoughtshare and befuddled are also provided to create json files.  A Makefile is provided for these as well. (These are in the main directory)
+
+The commands for the Makefile are as follows:
+
+make
+	-This will compile the program
+
+make runBF
+	-This will run the befuddled generator
+	-The user will be prompted to enter a filename, and then prompted to enter the number of json objects to generate
+	-Move this file onto the hadoop file system in order to use it for the mapreduce jobs.  Make sure to change the filepaths in Makefiles if it is not put into a "./test/" directory.  Otherwise, be sure to just change the filename according to the filename generated.
