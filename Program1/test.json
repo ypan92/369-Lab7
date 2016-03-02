@@ -1,0 +1,24 @@
+{
+  "this json": "will be ignored because it doesn't have a 'game' key",
+  "uba": "yes",
+  "hbc": "no"
+}
+{
+  "game": "1",
+  "usj": "no",
+  "cbv": "no",
+  "orf": "yes",
+  "rss": "no",
+  "egf": "yes",
+  "hoy": "yes"
+}
+{
+  "game": "1",
+  "rjt": "yes"
+}
+{
+  "game": "1",
+  "dtx": "yes",
+  "dot": "no",
+  "rjt": "yes"
+}
