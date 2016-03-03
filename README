@@ -1,14 +1,18 @@
 Lab 7 for Jordan Tang and Yang Pan
 
+======================================
+----------- MapReduce Jobs -----------
+======================================
+
 Each program is organized into their own directories
 Makefiles are provided for each program, with variable assignments for each one at the top of each Makefile
 
-The format is as follows:
+The format is as follows (example from Program 1):
 
 ===============================
 program = histogram
-inputFilepath = ./test/
-inputFile = bfTest100.json
+inputFilepath = ./test/				<-- Edit this variable to change inputFilePath based on hadoop fs
+inputFile = bfTest100.json 			<-- Edit this variable to change the input filename used
 outputFilepath = ./test/l7p1output
 jarFilepath = ./../jars/*
 mapReduceJarFilepath = ./../jars/json-mapreduce-1.0.jar
@@ -31,6 +35,9 @@ make remove
 make job
 	-This runs the hadoop job
 
+=======================================
+----------- JSON Generators -----------
+=======================================
 
 Generators for thoughtshare and befuddled are also provided to create json files.  A Makefile is provided for these as well. (These are in the main directory)
 
@@ -43,3 +50,15 @@ make runBF
 	-This will run the befuddled generator
 	-The user will be prompted to enter a filename, and then prompted to enter the number of json objects to generate
 	-Move this file onto the hadoop file system in order to use it for the mapreduce jobs.  Make sure to change the filepaths in Makefiles if it is not put into a "./test/" directory.  Otherwise, be sure to just change the filename according to the filename generated.
+
+make runTS
+	-This will run the TS generator (execution is different because partner used commandline arguments, I used runtime arguments)
+	-The makefile contains variables to specify the output filename and the number of objects
+
+	===========================
+	tsOutput = tsTest 		<-- This specifies output filename (don't need to add ".json" extension)
+	numObjs = 100			<-- This specifies number of ThghtShre objects to generate
+	===========================
+
+	-Move this file onto the hadoop file system in order to use it for the mapreduce jobs.  Make sure to change the filepaths in Makefiles if it is not put into a "./test/" directory.  Otherwise, be sure to just change the filename according to the filename generated.
+
